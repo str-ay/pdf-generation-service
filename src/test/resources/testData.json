@@ -1,0 +1,96 @@
+{
+  "rooms": {
+    "key": "rooms",
+    "rows": [
+      {
+        "name": "room name 1",
+        "total": "total r1"
+      },
+      {
+        "name": "room name 2",
+        "total": "total r2"
+      }
+    ]
+  },
+  "items": {
+    "key": "i",
+    "rows": [
+      {
+        "name": "name1",
+        "quantity": "q1",
+        "value": "v1",
+        "comments": "c1"
+      },
+      {
+        "name": "name2",
+        "quantity": "q2",
+        "value": "v2",
+        "comments": "c2"
+      }
+    ]
+  },
+  "general_information_l": "General Information",
+  "move_type_l": "Move Type",
+  "contact_l": "Contact",
+  "your_email_l": "yourEmailL",
+  "phone_l": "setPhoneL",
+  "mobile_l": "setMobileL",
+  "address_1_l": "setAddress1L",
+  "address_2_l": "setAddress2L",
+  "city_l": "setCityL",
+  "state_l": "setStateL",
+  "zip_l": "setZipL",
+  "country_l": "setCountryL",
+  "comments_l": "setCommentsL",
+  "move_type": "Move Type Val",
+  "contact": "Contact Val",
+  "your_email": "yourEmail",
+  "phone": "setPhone",
+  "mobile": "setMobile",
+  "address_1": "setAddress1",
+  "address_2": "setAddress2",
+  "city": "setCity",
+  "state": "setState",
+  "zip": "setZip",
+  "country": "setCountry",
+  "comments": "setComments",
+  "address_details_l": "Address Details",
+  "origin_l": "Origin",
+  "destination_l": "Destination",
+  "o_address_1_l": "setoAddress1L",
+  "o_address_2_l": "setoAddress2L",
+  "o_city_l": "setoCityL",
+  "o_state_l": "setoStateL",
+  "o_zip_l": "setoZipL",
+  "o_country_l": "setoCountryL",
+  "o_comments_l": "setoCommentsL",
+  "o_address_1": "setoAddress1",
+  "o_address_2": "setoAddress2",
+  "o_city": "setoCity",
+  "o_state": "setoState",
+  "o_zip": "setoZip",
+  "o_country": "setoCountry",
+  "o_comments": "setoComments",
+  "d_address_1_l": "setdAddress1L",
+  "d_address_2_l": "setdAddress2L",
+  "d_city_l": "setdCityL",
+  "d_state_l": "setdStateL",
+  "d_zip_l": "setdZipL",
+  "d_country_l": "setdCountryL",
+  "d_comments_l": "setdCommentsL",
+  "d_address_1": "setdAddress1",
+  "d_address_2": "setdAddress2",
+  "d_city": "setdCity",
+  "d_state": "setdState",
+  "d_zip": "setdZip",
+  "d_country": "setdCountry",
+  "d_comments": "setdComments",
+  "survey_information_l": "Survey Information",
+  "rooms_l": "Rooms",
+  "items_l": "Items",
+  "survey_total": null,
+  "item_l": "setItemL",
+  "item_quantity_l": "setItemQuantityL",
+  "item_value_l": "setItemValueL",
+  "item_comments_l": "setItemCommentsL"
+}

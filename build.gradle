@@ -1,0 +1,120 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
+buildscript {
+    ext {
+        springBootVersion = '1.4.0.RELEASE'
+        springVersion = '4.2.6.RELEASE'
+        springDataJpaVersion = '1.10.1.RELEASE'
+        slf4jVersion = '1.7.21'
+        logbackVersion = '1.1.7'
+        jstlVersion = '1.2'
+        jtdsVersion = '1.3.1'
+        commonsLang3Version = '3.4'
+        commonsCodecVersion = '1.10'
+        jacksonVersion = '2.7.4'
+        javaxMailVersion = '1.5.0-b01'
+        velocityVersion = '1.7'
+        xdocreportVersion = '1.0.6'
+        batikSvggenVersion = '1.8'
+        poiVersion = '3.15-beta2'
+    }
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+        classpath("se.transmode.gradle:gradle-docker:1.2")
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'spring-boot'
+apply plugin: 'docker'
+
+group = 'jnesspro'
+
+def profile = project.getProperties().get("profile") ?: "dev"
+def appVersion = ""
+if (profile != "docker") {
+    appVersion = "${profile}-1.0"
+}
+
+jar {
+    baseName = 'pdf-generation-service'
+    version = appVersion
+
+    rootSpec.filesMatching("application.properties", { details ->
+        filter(ReplaceTokens, tokens: [VERSION: version])
+    })
+}
+
+sourceSets {
+    main {
+        resources {
+            srcDirs = ["src/main/resources", "src/main/profile/${profile}"]
+        }
+        output.resourcesDir = "${project.buildDir}/resources/${profile}"
+    }
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+
+dependencies {
+    compile('org.springframework.boot:spring-boot-starter-web')
+    compile("org.springframework:spring-context-support:${springVersion}")
+
+    compile("org.slf4j:slf4j-api:${slf4jVersion}")
+    runtime("ch.qos.logback:logback-classic:${logbackVersion}")
+    //freemarker's log fix
+    compile("org.slf4j:log4j-over-slf4j:1.7.21")
+
+    compile("com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}")
+    compile("org.apache.velocity:velocity:${velocityVersion}")
+
+    //    Utils
+    compile('com.google.code.gson:gson:2.7')
+    compile('jboss:javassist:3.7.ga')
+    compile("org.apache.commons:commons-lang3:${commonsLang3Version}")
+    compile("javax.mail:mail:${javaxMailVersion}")
+
+//    PDF
+    compile("org.apache.xmlgraphics:batik-svggen:${batikSvggenVersion}")
+    compile("fr.opensagres.xdocreport:fr.opensagres.xdocreport.document.odt:${xdocreportVersion}")
+    compile("fr.opensagres.xdocreport:fr.opensagres.xdocreport.document.docx:${xdocreportVersion}")
+    compile("fr.opensagres.xdocreport:fr.opensagres.xdocreport.template.freemarker:${xdocreportVersion}")
+    compile("fr.opensagres.xdocreport:fr.opensagres.xdocreport.template.velocity:${xdocreportVersion}")
+    compile("fr.opensagres.xdocreport:fr.opensagres.xdocreport.converter.odt.odfdom:${xdocreportVersion}")
+    compile("fr.opensagres.xdocreport:fr.opensagres.xdocreport.converter.docx.docx4j:${xdocreportVersion}")
+
+    compile("org.apache.poi:poi:${poiVersion}")
+    compile("org.apache.poi:poi-ooxml:${poiVersion}")
+
+    testCompile("org.springframework.boot:spring-boot-starter-test")
+}
+
+eclipse {
+    classpath {
+        containers.remove('org.eclipse.jdt.launching.JRE_CONTAINER')
+        containers 'org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8'
+    }
+}
+
+task buildDocker(type: Docker, dependsOn: build) {
+    push = false
+    applicationName = jar.baseName
+    dockerfile = file('docker/Dockerfile')
+    doFirst {
+        copy {
+            from jar
+            into stageDir
+        }
+    }
+}
