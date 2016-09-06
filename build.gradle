@@ -32,6 +32,7 @@ apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'spring-boot'
 apply plugin: 'docker'
+apply plugin: 'war'
 
 group = 'jnesspro'
 
@@ -48,6 +49,11 @@ jar {
     rootSpec.filesMatching("application.properties", { details ->
         filter(ReplaceTokens, tokens: [VERSION: version])
     })
+}
+
+war {
+    baseName = 'pdf-generation-service'
+    version = appVersion
 }
 
 sourceSets {
@@ -69,6 +75,7 @@ repositories {
 
 dependencies {
     compile('org.springframework.boot:spring-boot-starter-web')
+    providedRuntime("org.springframework.boot:spring-boot-starter-tomcat")
     compile("org.springframework:spring-context-support:${springVersion}")
 
     compile("org.slf4j:slf4j-api:${slf4jVersion}")
