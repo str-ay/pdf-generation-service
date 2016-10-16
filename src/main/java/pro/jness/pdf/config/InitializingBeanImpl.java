@@ -15,7 +15,6 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
-import pro.jness.pdf.config.AppProperties;
 import pro.jness.pdf.exception.PdfCreationException;
 import pro.jness.pdf.utils.ClassNameUtil;
 
@@ -36,6 +35,7 @@ public class InitializingBeanImpl implements InitializingBean {
         this.appProperties = appProperties;
     }
 
+    @Override
     public void afterPropertiesSet() throws Exception {
         pdfWarmingUp();
         cleaningUp();

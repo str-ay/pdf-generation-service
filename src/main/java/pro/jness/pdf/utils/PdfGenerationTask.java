@@ -21,10 +21,7 @@ import pro.jness.pdf.dto.SourcesData;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.Callable;
 
 /**
@@ -115,10 +112,35 @@ public class PdfGenerationTask implements Callable<PdfGenerationResult> {
                 for (JsonElement row : rows) {
                     Object obj = clazz.newInstance();
                     for (Map.Entry<String, JsonElement> rowData : row.getAsJsonObject().entrySet()) {
-                        clazz.getMethod("set" + Character.toUpperCase(rowData.getKey().charAt(0)) + rowData.getKey().substring(1), String.class)
-                                .invoke(obj, rowData.getValue().isJsonNull() ? "" : rowData.getValue().getAsString());
-
-                        logger.debug("{}: {}", rowData.getKey(), rowData.getValue().isJsonNull() ? null : rowData.getValue().getAsString());
+                        if (rowData.getValue().isJsonArray()) {
+                            if (rowData.getValue().isJsonNull()) {
+                                clazz.getMethod("set" + Character.toUpperCase(rowData.getKey().charAt(0)) + rowData.getKey().substring(1), String.class)
+                                        .invoke(obj, rowData.getValue().isJsonNull() ? "" : rowData.getValue().getAsString());
+                            } else {
+                                JsonElement value = rowData.getValue();
+                                JsonArray asJsonArray = value.getAsJsonArray();
+                                final Map<String, Class<?>> itemProperties = new HashMap<>();
+                                for (Map.Entry<String, JsonElement> item : asJsonArray.get(0).getAsJsonObject().entrySet()) {
+                                    itemProperties.put(item.getKey(), String.class);
+                                }
+                                String itemClassName = UUID.randomUUID().toString().replaceAll("-", "");
+                                Class<?> itemClass = PojoGenerator.generate(itemClassName, itemProperties);
+                                ArrayList itemList = new ArrayList();
+                                for (JsonElement itemElement : asJsonArray) {
+                                    Object itemObj = itemClass.newInstance();
+                                    for (Map.Entry<String, JsonElement> itemData : itemElement.getAsJsonObject().entrySet()) {
+                                        itemClass.getMethod("set" + Character.toUpperCase(itemData.getKey().charAt(0)) + itemData.getKey().substring(1), String.class)
+                                                .invoke(itemObj, itemData.getValue().isJsonNull() ? "" : itemData.getValue().getAsString());
+                                    }
+                                    itemList.add(itemObj);
+                                }
+                                clazz.getMethod("set" + Character.toUpperCase(rowData.getKey().charAt(0)) + rowData.getKey().substring(1), List.class)
+                                        .invoke(obj, rowData.getValue().isJsonNull() ? new ArrayList() : itemList);
+                            }
+                        } else {
+                            clazz.getMethod("set" + Character.toUpperCase(rowData.getKey().charAt(0)) + rowData.getKey().substring(1), String.class)
+                                    .invoke(obj, rowData.getValue().isJsonNull() ? "" : rowData.getValue().getAsString());
+                        }
                     }
                     rowList.add(obj);
                 }

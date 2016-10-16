@@ -26,6 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@Ignore
 public class ApplicationTests {
 
     @Autowired
@@ -35,7 +36,6 @@ public class ApplicationTests {
      * Passed
      */
     @Test
-    @Ignore
     public void stress() throws Exception {
         ClassLoader classLoader = getClass().getClassLoader();
         MockMultipartFile firstFile = new MockMultipartFile("data", "testData.json", "application/json",

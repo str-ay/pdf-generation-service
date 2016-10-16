@@ -12,7 +12,6 @@ import pro.jness.pdf.config.AppProperties;
 import pro.jness.pdf.exception.PdfCreationException;
 import pro.jness.pdf.service.PdfCreationService;
 import pro.jness.pdf.utils.PdfGenerationResult;
-import pro.jness.pdf.utils.PdfQueueService;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
@@ -49,7 +48,7 @@ public class TaskController {
     @RequestMapping(value = "/{id}/check", method = RequestMethod.GET)
     @ResponseBody
     public RequestResult check(@PathVariable("id") String taskId) throws PdfCreationException {
-        PdfGenerationResult results = PdfQueueService.getStatus(taskId);
+        PdfGenerationResult results = pdfCreationService.getStatus(taskId);
         return new RequestResult(taskId, results.getStatus(), results.getMessage());
     }
 
@@ -57,9 +56,9 @@ public class TaskController {
     @ResponseBody
     public void getResult(@PathVariable("id") String taskId, HttpServletResponse response) throws PdfCreationException, IOException {
         File file = new File(new File(appProperties.getTasksDirectory(), taskId), taskId + ".pdf");
-        if (!PdfQueueService.isDone(taskId) || !file.exists()) {
+        if (!pdfCreationService.isDone(taskId) || !file.exists()) {
             String errorMessage;
-            if (!PdfQueueService.isDone(taskId)) {
+            if (!pdfCreationService.isDone(taskId)) {
                 errorMessage = "Task is not completed";
             } else {
                 errorMessage = "Task is completed but result does not exists.";

@@ -4,11 +4,39 @@
     "rows": [
       {
         "name": "room name 1",
-        "total": "total r1"
+        "total": "total r1",
+        "items": [
+          {
+            "name": "room item 1",
+            "quantity": "10",
+            "value": "10",
+            "comments": "no comments"
+          },
+          {
+            "name": "room item 2",
+            "quantity": "20",
+            "value": "20",
+            "comments": "no comments"
+          }
+        ]
       },
       {
         "name": "room name 2",
-        "total": "total r2"
+        "total": "total r2",
+        "items": [
+          {
+            "name": "room item 1",
+            "quantity": "10",
+            "value": "10",
+            "comments": "no comments"
+          },
+          {
+            "name": "room item 2",
+            "quantity": "20",
+            "value": "20",
+            "comments": "no comments"
+          }
+        ]
       }
     ]
   },

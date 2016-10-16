@@ -4,3 +4,5 @@ out/
 classes/
 .gradle/
 src/main/profile/dev
+src/main/profile/azure
+src/main/profile/aws
