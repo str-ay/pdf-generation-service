@@ -115,7 +115,7 @@ eclipse {
 }
 
 task buildDocker(type: Docker, dependsOn: build) {
-    push = yes
+    push = true
     applicationName = jar.baseName
     dockerfile = file('docker/Dockerfile')
     doFirst {
