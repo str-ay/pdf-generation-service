@@ -2,8 +2,8 @@ import org.apache.tools.ant.filters.ReplaceTokens
 
 buildscript {
     ext {
-        springBootVersion = '1.4.1.RELEASE'
-        springVersion = '4.3.3.RELEASE'
+        springBootVersion = '1.4.2.RELEASE'
+        springVersion = '4.3.4.RELEASE'
         springDataJpaVersion = '1.10.1.RELEASE'
         slf4jVersion = '1.7.21'
         logbackVersion = '1.1.7'
@@ -24,21 +24,21 @@ buildscript {
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
-        classpath("se.transmode.gradle:gradle-docker:1.2")
     }
 }
 
 apply plugin: 'java'
 apply plugin: 'spring-boot'
-apply plugin: 'docker'
 apply plugin: 'war'
 
 group = 'jnesspro'
 
 def profile = project.getProperties().get("profile") ?: "dev"
+def buildInfo = (new Date()).format('yyyy-MM-dd HH:mm')
+
 def appVersion = ""
 if (profile != "docker") {
-    appVersion = "${profile}-1.0"
+    appVersion = "${profile}-1.0.1"
 }
 
 jar {
@@ -46,8 +46,23 @@ jar {
     version = appVersion
 
     rootSpec.filesMatching("application.properties", { details ->
-        filter(ReplaceTokens, tokens: [VERSION: version])
+        filter(ReplaceTokens, tokens: ['application.version': version])
     })
+
+    manifest {
+        attributes(
+                'Main-Class': 'pro.jness.pdf.Application'
+        )
+    }
+}
+
+processResources {
+    filesMatching('**/*.properties') {
+        filter(ReplaceTokens, tokens: [
+                "application.version": version,
+                "application.build_info": buildInfo
+        ])
+    }
 }
 
 war {
@@ -104,16 +119,4 @@ dependencies {
     compile("org.apache.poi:poi-ooxml:${poiVersion}")
 
     testCompile("org.springframework.boot:spring-boot-starter-test")
-}
-
-task buildDocker(type: Docker, dependsOn: build) {
-    push = true
-    applicationName = jar.baseName
-    dockerfile = file('docker/Dockerfile')
-    doFirst {
-        copy {
-            from jar
-            into stageDir
-        }
-    }
 }

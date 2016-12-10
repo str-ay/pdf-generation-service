@@ -14,22 +14,28 @@ import pro.jness.pdf.config.AppProperties;
 @RequestMapping(value = "/info")
 public class InfoController {
 
+    private final AppProperties appProperties;
+
     @Autowired
-    private AppProperties appProperties;
+    public InfoController(AppProperties appProperties) {
+        this.appProperties = appProperties;
+    }
 
     @RequestMapping(method = RequestMethod.GET, value = "/version")
     public VersionInfo version() {
-        return new VersionInfo(appProperties.getVersion());
+        return new VersionInfo(appProperties.getVersion(), appProperties.getBuildInfo());
     }
 
     public static class VersionInfo {
         private String version;
+        private String buildInfo;
 
         public VersionInfo() {
         }
 
-        public VersionInfo(String version) {
+        VersionInfo(String version, String buildInfo) {
             this.version = version;
+            this.buildInfo = buildInfo;
         }
 
         public String getVersion() {
@@ -38,6 +44,14 @@ public class InfoController {
 
         public void setVersion(String version) {
             this.version = version;
+        }
+
+        public String getBuildInfo() {
+            return buildInfo;
+        }
+
+        public void setBuildInfo(String buildInfo) {
+            this.buildInfo = buildInfo;
         }
     }
 }

@@ -15,8 +15,10 @@ import javax.annotation.PostConstruct;
 @PropertySources(@PropertySource("classpath:application.properties"))
 public class AppProperties {
 
-    @Value("${version}")
+    @Value("${application.version}")
     private String version;
+    @Value("${application.build_info}")
+    private String buildInfo;
     @Value("${tasks_directory}")
     private String tasksDirectory;
 
@@ -26,6 +28,10 @@ public class AppProperties {
 
     public String getVersion() {
         return version;
+    }
+
+    public String getBuildInfo() {
+        return buildInfo;
     }
 
     public String getTasksDirectory() {
