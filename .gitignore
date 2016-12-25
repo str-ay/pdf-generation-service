@@ -10,3 +10,4 @@ src/main/profile/aws
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
+/docker/pdf-generation-service.jar
