@@ -64,9 +64,6 @@ public class PdfGenerationTask implements Callable<PdfGenerationResult> {
                 fillContext();
                 ixDocReport.convert(iContext, options, out);
             }
-        } catch (freemarker.core.ParseException e) {
-            logger.error(e.getMessage(), e);
-            return new PdfGenerationResult(PdfCreationStatus.FAILED, e.getMessage());
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
             return new PdfGenerationResult(PdfCreationStatus.FAILED, e.getMessage());
@@ -107,7 +104,7 @@ public class PdfGenerationTask implements Callable<PdfGenerationResult> {
                 Class<?> clazz = PojoGenerator.generate(className, properties);
                 FieldsMetadata fieldsMetadata = ixDocReport.createFieldsMetadata();
                 fieldsMetadata.load(rowKey, clazz, true);
-                ArrayList rowList = new ArrayList();
+                List rowList = new ArrayList();
 
                 for (JsonElement row : rows) {
                     Object obj = clazz.newInstance();

@@ -4,7 +4,10 @@ LABEL Description="PDF generation service. Builds PDF from ODT template (Freemar
 
 EXPOSE 8080
 VOLUME /tmp /var/log /var/pdf_tasks
-ADD pdf-generation-service.jar app.jar
+ADD pdf-generation-service.war app.war
+RUN apk update
+RUN apk upgrade
+RUN apk add ttf-dejavu
 ADD fonts/* /usr/share/fonts/
-RUN sh -c 'touch /app.jar'
-ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]
+RUN sh -c 'touch /app.war'
+ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/app.war"]

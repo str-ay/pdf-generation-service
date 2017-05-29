@@ -11,3 +11,4 @@ src/main/profile/aws
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
 /docker/pdf-generation-service.jar
+/docker/pdf-generation-service.war

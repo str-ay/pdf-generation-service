@@ -1,0 +1,17 @@
+server:
+  port: 8080
+
+spring:
+  autoconfigure:
+    exclude: "org.springframework.cloud.aws.autoconfigure.mail.MailSenderAutoConfiguration"
+
+  http:
+    multipart:
+      max-file-size:
+        100MB
+      max-request-size:
+        100MB
+
+pdfgs:
+  tasksDirectory: "/var/pdf_tasks"
+  version: ${version}

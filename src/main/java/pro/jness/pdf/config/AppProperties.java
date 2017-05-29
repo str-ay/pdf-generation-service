@@ -1,40 +1,37 @@
 package pro.jness.pdf.config;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.context.annotation.PropertySources;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
+import javax.validation.constraints.NotNull;
 
 /**
  * @author Aleksandr Streltsov (jness.pro@gmail.com)
- *         on 24/08/16
+ *         on 15/12/2016
  */
-@Configuration
-@PropertySources(@PropertySource("classpath:application.properties"))
+@Component
+@ConfigurationProperties(prefix = "pdfgs")
 public class AppProperties {
 
-    @Value("${application.version}")
+    @NotNull
     private String version;
-    @Value("${application.build_info}")
-    private String buildInfo;
-    @Value("${tasks_directory}")
-    private String tasksDirectory;
 
-    @PostConstruct
-    public void init() {
-    }
+    @NotNull
+    private String tasksDirectory;
 
     public String getVersion() {
         return version;
     }
 
-    public String getBuildInfo() {
-        return buildInfo;
+    public void setVersion(String version) {
+        this.version = version;
     }
 
     public String getTasksDirectory() {
         return tasksDirectory;
+    }
+
+    public void setTasksDirectory(String tasksDirectory) {
+        this.tasksDirectory = tasksDirectory;
     }
 }

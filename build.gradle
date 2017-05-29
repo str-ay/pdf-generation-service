@@ -1,22 +1,17 @@
-import org.apache.tools.ant.filters.ReplaceTokens
+def ver = '1.0.03d2017.5.29'
+version ver
+project.properties.version = ver
 
 buildscript {
     ext {
-        springBootVersion = '1.4.2.RELEASE'
-        springVersion = '4.3.4.RELEASE'
-        springDataJpaVersion = '1.10.1.RELEASE'
+        springBootVersion = '1.5.3.RELEASE'
         slf4jVersion = '1.7.21'
         logbackVersion = '1.1.7'
-        jstlVersion = '1.2'
-        jtdsVersion = '1.3.1'
-        commonsLang3Version = '3.4'
-        commonsCodecVersion = '1.10'
         jacksonVersion = '2.7.4'
-        javaxMailVersion = '1.5.0-b01'
         velocityVersion = '1.7'
-        xdocreportVersion = '1.0.6'
-        batikSvggenVersion = '1.8'
-        poiVersion = '3.15-beta2'
+        xdocreportVersion = '2.0.0'
+        batikSvggenVersion = '1.9'
+        poiVersion = '3.16'
     }
     repositories {
         mavenCentral()
@@ -31,43 +26,27 @@ apply plugin: 'java'
 apply plugin: 'spring-boot'
 apply plugin: 'war'
 
-group = 'jnesspro'
-
 def profile = project.getProperties().get("profile") ?: "dev"
-def buildInfo = (new Date()).format('yyyy-MM-dd HH:mm')
-
-def appVersion = ""
-if (profile != "docker") {
-    appVersion = "${profile}-1.0.1"
-}
-
-jar {
-    baseName = 'pdf-generation-service'
-    version = appVersion
-
-    rootSpec.filesMatching("application.properties", { details ->
-        filter(ReplaceTokens, tokens: ['application.version': version])
-    })
-
-    manifest {
-        attributes(
-                'Main-Class': 'pro.jness.pdf.Application'
-        )
-    }
-}
 
 processResources {
-    filesMatching('**/*.properties') {
-        filter(ReplaceTokens, tokens: [
-                "application.version": version,
-                "application.build_info": buildInfo
-        ])
+    filesMatching('application.yml') {
+        expand(project.properties)
     }
 }
 
 war {
     baseName = 'pdf-generation-service'
-    version = appVersion
+    version = ver
+}
+
+bootRepackage {
+    mainClass = 'pro.jness.pdf.Application'
+    excludeDevtools = true
+}
+
+task makeDockerExecutable(dependsOn: 'bootRepackage', type: Copy) {
+    from war.archivePath
+    into "docker"
 }
 
 sourceSets {
@@ -86,16 +65,11 @@ repositories {
     mavenCentral()
 }
 
-
 dependencies {
     compile('org.springframework.boot:spring-boot-starter-web')
     compile("org.springframework.boot:spring-boot-starter-tomcat")
-    compile("org.springframework:spring-context-support:${springVersion}")
-
-    compile("org.slf4j:slf4j-api:${slf4jVersion}")
-    runtime("ch.qos.logback:logback-classic:${logbackVersion}")
-    //freemarker's log fix
-    compile("org.slf4j:log4j-over-slf4j:1.7.21")
+    compile('org.springframework.boot:spring-boot-starter-mail')
+    compile("org.springframework:spring-context-support")
 
     compile("com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}")
     compile("org.apache.velocity:velocity:${velocityVersion}")
@@ -103,11 +77,9 @@ dependencies {
     //    Utils
     compile('com.google.code.gson:gson:2.7')
     compile('jboss:javassist:3.7.ga')
-    compile("org.apache.commons:commons-lang3:${commonsLang3Version}")
-    compile("javax.mail:mail:${javaxMailVersion}")
+    compile("org.apache.commons:commons-lang3:3.5")
 
-//    PDF
-    compile("org.apache.xmlgraphics:batik-svggen:${batikSvggenVersion}")
+        compile("org.apache.xmlgraphics:batik-svggen:${batikSvggenVersion}")
     compile("fr.opensagres.xdocreport:fr.opensagres.xdocreport.document.odt:${xdocreportVersion}")
     compile("fr.opensagres.xdocreport:fr.opensagres.xdocreport.document.docx:${xdocreportVersion}")
     compile("fr.opensagres.xdocreport:fr.opensagres.xdocreport.template.freemarker:${xdocreportVersion}")
