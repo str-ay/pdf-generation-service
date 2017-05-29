@@ -44,11 +44,6 @@ bootRepackage {
     excludeDevtools = true
 }
 
-task makeDockerExecutable(dependsOn: 'bootRepackage', type: Copy) {
-    from war.archivePath
-    into "docker"
-}
-
 sourceSets {
     main {
         resources {
