@@ -2,10 +2,9 @@
 build/
 out/
 classes/
+docker/*.war
 .gradle/
 src/main/profile/dev
-src/main/profile/azure
-src/main/profile/aws
 # Elastic Beanstalk Files
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
