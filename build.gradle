@@ -1,4 +1,4 @@
-def ver = '1.0.06d2017.7.03'
+def ver = '1.0.07d2017.09.21'
 version ver
 project.properties.version = ver
 
