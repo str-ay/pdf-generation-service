@@ -26,17 +26,66 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-//@Ignore
+@Ignore
 public class ApplicationTests {
 
     @Autowired
     private WebApplicationContext webApplicationContext;
 
+    @Test
+    public void tableExample() throws Exception {
+        ClassLoader classLoader = getClass().getClassLoader();
+        MockMultipartFile firstFile = new MockMultipartFile("data", "testDataTable.json", "application/json",
+                Files.readAllBytes(Paths.get(classLoader.getResource("testDataTable.json").toURI())));
+        MockMultipartFile secondFile = new MockMultipartFile("template", "test.odt", "application/octet-stream",
+                Files.readAllBytes(Paths.get(classLoader.getResource("test.odt").toURI())));
+        MockMvc mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        MvcResult mvcResult = mockMvc.perform(
+                MockMvcRequestBuilders.fileUpload("/task/make")
+                        .file(firstFile)
+                        .file(secondFile)
+        )
+                .andExpect(status().is(200))
+                .andExpect(jsonPath("$.taskId", notNullValue()))
+                .andExpect(jsonPath("$.status", is(PdfCreationStatus.QUEUED.name())))
+                .andReturn();
+        String resultString = mvcResult.getResponse().getContentAsString();
+        JsonParser parser = new JsonParser();
+        JsonElement data = parser.parse(resultString);
+        String taskId = data.getAsJsonObject().get("taskId").getAsString();
+
+        PdfCreationStatus status;
+        MvcResult checkMvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/task/" + taskId + "/check"))
+                .andExpect(status().is(200))
+                .andExpect(jsonPath("$.taskId", is(taskId)))
+                .andExpect(jsonPath("$.status", isOneOf(PdfCreationStatus.QUEUED.name(), PdfCreationStatus.DONE.name()))).andReturn();
+        JsonElement checkResult = parser.parse(checkMvcResult.getResponse().getContentAsString());
+        status = PdfCreationStatus.valueOf(checkResult.getAsJsonObject().get("status").getAsString());
+        if (!status.equals(PdfCreationStatus.DONE)) {
+            for (int i = 0; i < 3; i++) {
+                Thread.sleep(1000);
+                checkMvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/task/" + taskId + "/check"))
+                        .andExpect(status().is(200))
+                        .andExpect(jsonPath("$.taskId", is(taskId))).andReturn();
+                checkResult = parser.parse(checkMvcResult.getResponse().getContentAsString());
+                status = PdfCreationStatus.valueOf(checkResult.getAsJsonObject().get("status").getAsString());
+                if (status.equals(PdfCreationStatus.DONE)) {
+                    break;
+                }
+            }
+        }
+        Assert.assertEquals("Task not completed successfully [" + status + "]", PdfCreationStatus.DONE, status);
+
+        MvcResult getResultMvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/task/" + taskId + "/result"))
+                .andExpect(status().is(200))
+                .andReturn();
+        Assert.assertEquals("Task result is bad. Message: " + getResultMvcResult.getResponse().getContentAsString(), "application/pdf", getResultMvcResult.getResponse().getContentType());
+    }
+
     /**
      * Passed
      */
     @Test
-    @Ignore
     public void stress() throws Exception {
         ClassLoader classLoader = getClass().getClassLoader();
         MockMultipartFile firstFile = new MockMultipartFile("data", "testData.json", "application/json",

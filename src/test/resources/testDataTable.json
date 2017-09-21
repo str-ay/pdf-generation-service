@@ -1,0 +1,15 @@
+{
+  "lgr": {
+    "key": "lgr",
+    "rows": [
+      {
+        "lgNameAndItems": "v1",
+        "description": "v2"
+      },
+      {
+        "lgNameAndItems": "v1_1",
+        "description": "v2_1"
+      }
+    ]
+  }
+}

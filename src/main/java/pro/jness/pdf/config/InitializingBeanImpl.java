@@ -9,6 +9,7 @@ import fr.opensagres.xdocreport.document.registry.XDocReportRegistry;
 import fr.opensagres.xdocreport.template.IContext;
 import fr.opensagres.xdocreport.template.TemplateEngineKind;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -21,6 +22,11 @@ import pro.jness.pdf.utils.ClassNameUtil;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Calendar;
 import java.util.UUID;
 
 @Component
@@ -41,22 +47,19 @@ public class InitializingBeanImpl implements InitializingBean {
         cleaningUp();
     }
 
-    private void cleaningUp() throws IOException, PdfCreationException {
+    private void cleaningUp() throws IOException, PdfCreationException, URISyntaxException {
         logger.info("Cleaning up...");
-        File tasks = new File(appProperties.getTasksDirectory());
-        makeDirectory();
-        FileUtils.cleanDirectory(tasks);
-        logger.info("Cleaning up complete");
-    }
-
-    private File makeDirectory() throws PdfCreationException {
-        File file = new File(appProperties.getTasksDirectory());
-        if (!file.exists()) {
-            if (!file.mkdirs()) {
-                throw new PdfCreationException("Can not create directory " + file.getAbsolutePath());
-            }
+        Path tasks;
+        if (StringUtils.isNotBlank(appProperties.getTasksDirectory())) {
+            tasks = Paths.get(appProperties.getTasksDirectory());
+        } else {
+            tasks = File.createTempFile(
+                    "" + Calendar.getInstance().getTimeInMillis(), ".tmp").toPath()
+                    .getParent().resolve("pdfgs").resolve("tasks");
+            appProperties.setTasksDirectory(tasks.toFile().getAbsolutePath());
         }
-        return file;
+        FileUtils.deleteDirectory(tasks.toFile());
+        Files.createDirectories(tasks);
     }
 
     private void pdfWarmingUp() {

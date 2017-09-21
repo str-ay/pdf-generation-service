@@ -15,8 +15,6 @@ public class AppProperties {
 
     @NotNull
     private String version;
-
-    @NotNull
     private String tasksDirectory;
 
     public String getVersion() {

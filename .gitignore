@@ -5,6 +5,7 @@ classes/
 docker/*.war
 .gradle/
 src/main/profile/dev
+src/main/profile/clients
 # Elastic Beanstalk Files
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
