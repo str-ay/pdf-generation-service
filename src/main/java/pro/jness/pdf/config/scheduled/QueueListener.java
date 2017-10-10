@@ -23,7 +23,7 @@ public class QueueListener {
         this.pdfCreationService = pdfCreationService;
     }
 
-    @Scheduled(fixedRate = 120000)
+    @Scheduled(fixedRate = 1000 * 60 * 2)
     public void configureTasks() {
         logger.info(pdfCreationService.getInfo());
     }

@@ -1,10 +1,10 @@
-def ver = '1.0.07d2017.09.21'
+def ver = '1.0.08d2017.10.10'
 version ver
 project.properties.version = ver
 
 buildscript {
     ext {
-        springBootVersion = '1.5.6.RELEASE'
+        springBootVersion = '1.5.7.RELEASE'
         slf4jVersion = '1.7.21'
         logbackVersion = '1.1.7'
         velocityVersion = '1.7'

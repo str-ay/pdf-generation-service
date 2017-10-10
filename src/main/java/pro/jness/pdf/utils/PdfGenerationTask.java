@@ -21,63 +21,58 @@ import pro.jness.pdf.dto.SourcesData;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.Callable;
 
 /**
  * @author Aleksandr Streltsov (jness.pro@gmail.com)
- *         on 26/08/16
+ * on 26/08/16
  */
 public class PdfGenerationTask implements Callable<PdfGenerationResult> {
 
     private static final Logger logger = LoggerFactory.getLogger(ClassNameUtil.getCurrentClassName());
 
     private SourcesData sourcesData;
+    private Path resultDirectory;
 
-    private JsonElement data;
     private IXDocReport ixDocReport;
     private IContext iContext;
 
-    public PdfGenerationTask(SourcesData sourcesData) {
+    public PdfGenerationTask(SourcesData sourcesData, Path resultDirectory) {
         this.sourcesData = sourcesData;
+        this.resultDirectory = resultDirectory;
     }
 
     @Override
     public PdfGenerationResult call() throws Exception {
-        try (BufferedReader streamReader = new BufferedReader(new InputStreamReader(
-                new FileInputStream(sourcesData.getData()), "UTF-8"))) {
-            StringBuilder responseStrBuilder = new StringBuilder();
-
-            String inputStr;
-            while ((inputStr = streamReader.readLine()) != null)
-                responseStrBuilder.append(inputStr);
-            JsonParser parser = new JsonParser();
-            data = parser.parse(responseStrBuilder.toString());
-            if (!data.isJsonObject()) {
-                throw new IllegalStateException("Data is not a valid json");
-            }
-
-            File result = new File(sourcesData.getData().getParent(), sourcesData.getTaskId() + ".pdf");
-            try (FileOutputStream out = new FileOutputStream(result)) {
-                initReportAndContext();
-                Options options = Options.getTo(ConverterTypeTo.PDF).via(ConverterTypeVia.ODFDOM);
-                fillContext();
-                ixDocReport.convert(iContext, options, out);
-            }
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-            return new PdfGenerationResult(PdfCreationStatus.FAILED, e.getMessage());
+        JsonParser parser = new JsonParser();
+        String json = new String(sourcesData.getData(), Charset.forName("UTF-8"));
+        JsonElement data = parser.parse(json);
+        if (!data.isJsonObject()) {
+            throw new IllegalStateException("Data is not valid json");
         }
+
+        Path result = resultDirectory.resolve(sourcesData.getTaskId() + ".pdf");
+        initReportAndContext();
+        Options options = Options.getTo(ConverterTypeTo.PDF).via(ConverterTypeVia.ODFDOM);
+        fillContext(data);
+        OutputStream outputStream = Files.newOutputStream(result);
+        ixDocReport.convert(iContext, options, outputStream);
+        outputStream.close();
         return new PdfGenerationResult(PdfCreationStatus.DONE);
     }
 
     private void initReportAndContext() throws XDocReportException, IOException {
         ixDocReport = XDocReportRegistry.getRegistry().loadReport(
-                new FileInputStream(sourcesData.getTemplate()), TemplateEngineKind.Freemarker);
+                new ByteArrayInputStream(sourcesData.getTemplate()),
+                TemplateEngineKind.Freemarker);
         iContext = ixDocReport.createContext();
     }
 
-    private void fillContext() throws NotFoundException, CannotCompileException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, InstantiationException, XDocReportException {
+    private void fillContext(JsonElement data) throws NotFoundException, CannotCompileException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, InstantiationException, XDocReportException {
         for (Map.Entry<String, JsonElement> entry : data.getAsJsonObject().entrySet()) {
             if (entry.getValue().isJsonObject()) {
                 addTableRows(entry.getValue());

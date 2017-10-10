@@ -26,7 +26,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-@Ignore
 public class ApplicationTests {
 
     @Autowired
@@ -79,13 +78,15 @@ public class ApplicationTests {
         MvcResult getResultMvcResult = mockMvc.perform(MockMvcRequestBuilders.get("/task/" + taskId + "/result"))
                 .andExpect(status().is(200))
                 .andReturn();
-        Assert.assertEquals("Task result is bad. Message: " + getResultMvcResult.getResponse().getContentAsString(), "application/pdf", getResultMvcResult.getResponse().getContentType());
+        Assert.assertEquals("Task result is bad. Message: " + getResultMvcResult.getResponse().getContentAsString(),
+                "application/pdf", getResultMvcResult.getResponse().getContentType());
     }
 
     /**
      * Passed
      */
     @Test
+    @Ignore
     public void stress() throws Exception {
         ClassLoader classLoader = getClass().getClassLoader();
         MockMultipartFile firstFile = new MockMultipartFile("data", "testData.json", "application/json",

@@ -7,5 +7,5 @@ ver="$(echo ${ver:10})" &&
 cp build/libs/pdf-generation-service-${ver}.war docker/pdf-generation-service.war
 cd docker &&
 docker build -t jnesspro/pdf-generation-service .
-#docker run --name pdfgs -d -p 8085:8080 jnesspro/pdf-generation-service
+#docker run --name pdfgs --rm -d -p 8085:8080 jnesspro/pdf-generation-service
 #docker exec pdfgs fc-list

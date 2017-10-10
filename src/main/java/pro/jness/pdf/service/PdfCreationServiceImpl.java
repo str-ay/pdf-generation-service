@@ -2,13 +2,17 @@ package pro.jness.pdf.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import pro.jness.pdf.config.AppProperties;
 import pro.jness.pdf.dto.SourcesData;
 import pro.jness.pdf.exception.PdfCreationException;
 import pro.jness.pdf.exception.TaskNotFoundException;
 import pro.jness.pdf.utils.*;
 
 import javax.annotation.PreDestroy;
+import java.io.File;
+import java.nio.file.Paths;
 import java.util.concurrent.*;
 
 /**
@@ -22,6 +26,12 @@ public class PdfCreationServiceImpl implements PdfCreationService {
 
     private static ThreadPoolExecutor executorService = (ThreadPoolExecutor) Executors.newFixedThreadPool(10);
     private static ConcurrentHashMap<String, Future<PdfGenerationResult>> taskResults = new ConcurrentHashMap<>();
+    private final AppProperties appProperties;
+
+    @Autowired
+    public PdfCreationServiceImpl(AppProperties appProperties) {
+        this.appProperties = appProperties;
+    }
 
     @Override
     public void submit(PdfGenerationTask task) {
@@ -50,6 +60,7 @@ public class PdfCreationServiceImpl implements PdfCreationService {
                 try {
                     return taskResults.get(taskId).get();
                 } catch (InterruptedException | ExecutionException e) {
+                    logger.error(e.getMessage(), e);
                     throw new PdfCreationException("Can not get results");
                 }
             }
@@ -79,6 +90,6 @@ public class PdfCreationServiceImpl implements PdfCreationService {
 
     @Override
     public void newTask(SourcesData sourcesData) {
-        submit(new PdfGenerationTask(sourcesData));
+        submit(new PdfGenerationTask(sourcesData, Paths.get(appProperties.getTasksDirectory())));
     }
 }

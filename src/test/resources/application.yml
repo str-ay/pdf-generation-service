@@ -13,5 +13,5 @@ spring:
         100MB
 
 pdfgs:
-  tasksDirectory: "build/tests/tasks"
+  tasksDirectory: "/Users/ness/Public/pdfgs"
   version: ${version}

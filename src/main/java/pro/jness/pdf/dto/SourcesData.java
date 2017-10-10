@@ -1,35 +1,33 @@
 package pro.jness.pdf.dto;
 
-import java.io.File;
-
 /**
  * @author Aleksandr Streltsov (jness.pro@gmail.com)
  *         on 26/08/16
  */
 public class SourcesData {
-    private File template;
-    private File data;
+    private byte[] template;
+    private byte[] data;
     private String taskId;
 
-    public SourcesData(File template, File data, String taskId) {
+    public SourcesData(byte[] template, byte[] data, String taskId) {
         this.template = template;
         this.data = data;
         this.taskId = taskId;
     }
 
-    public File getTemplate() {
+    public byte[] getTemplate() {
         return template;
     }
 
-    public void setTemplate(File template) {
+    public void setTemplate(byte[] template) {
         this.template = template;
     }
 
-    public File getData() {
+    public byte[] getData() {
         return data;
     }
 
-    public void setData(File data) {
+    public void setData(byte[] data) {
         this.data = data;
     }
 

@@ -49,17 +49,16 @@ public class InitializingBeanImpl implements InitializingBean {
 
     private void cleaningUp() throws IOException, PdfCreationException, URISyntaxException {
         logger.info("Cleaning up...");
-        Path tasks;
-        if (StringUtils.isNotBlank(appProperties.getTasksDirectory())) {
-            tasks = Paths.get(appProperties.getTasksDirectory());
-        } else {
-            tasks = File.createTempFile(
+        if (StringUtils.isBlank(appProperties.getTasksDirectory())) {
+            Path tasks = File.createTempFile(
                     "" + Calendar.getInstance().getTimeInMillis(), ".tmp").toPath()
                     .getParent().resolve("pdfgs").resolve("tasks");
             appProperties.setTasksDirectory(tasks.toFile().getAbsolutePath());
         }
-        FileUtils.deleteDirectory(tasks.toFile());
-        Files.createDirectories(tasks);
+
+        Path dir = Paths.get(appProperties.getTasksDirectory());
+        Files.createDirectories(dir);
+        FileUtils.cleanDirectory(dir.toFile());
     }
 
     private void pdfWarmingUp() {
